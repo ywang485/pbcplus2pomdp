@@ -4,9 +4,9 @@ Python scripts that translate probabilistic action descriptions in pBC+ to POMDP
 
 ## Usage
 Noncompositional generation:
-$ python pbcplus2pomdp.py path/to/lpmln/files discount_factor(0~1)
+$ python pbcplus2pomdp.py path/to/lpmln/files discount_factor(0-1)
 Compositional generation:
-$ python pbcplus2pomdp_compositional.py path/to/lpmln/file/with/no/action path/to/lpmln/action/description/files discount_factor(0~1)
+$ python pbcplus2pomdp_compositional.py path/to/lpmln/file/with/no/action path/to/lpmln/action/description/files discount_factor(0-1)
 
 For example,
 $ python pbcplus2pomdp.py examples/tiger.lpmln  0.95
