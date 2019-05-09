@@ -1,0 +1,28 @@
+step(0).
+boolean(t; f).
+item(coffee; coke; pepsi; burger).
+person(alice; bob; carol).
+room(r1; r2).
+
+% UEC
+:- fl_ItemRequested(X1, I), fl_ItemRequested(X2, I), X1 != X2.
+:- not fl_ItemRequested(coffee, I), not fl_ItemRequested(coke, I),
+   not fl_ItemRequested(pepsi, I), not fl_ItemRequested(burger, I),
+   not fl_ItemRequested(na, I), step(I).
+:- fl_PersonRequested(X1, I), fl_PersonRequested(X2, I), X1 != X2.
+:- not fl_PersonRequested(alice, I), not fl_PersonRequested(bob, I),
+   not fl_PersonRequested(carol, I), not fl_PersonRequested(na, I),
+   step(I).
+:- fl_RoomRequested(X1, I), fl_RoomRequested(X2, I), X1 != X2.
+:- not fl_RoomRequested(r1, I), not fl_RoomRequested(r2, I),
+   not fl_RoomRequested(na, I),
+   step(I).
+:- fl_Terminated(X1, I), fl_Terminated(X2, I), X1 != X2.
+:- not fl_Terminated(t, I), not fl_Terminated(f, I), step(I).
+
+
+% Initial value of regular fluents and observation constants are exogenous
+{fl_Terminated(B, 0)} :- boolean(B).
+{fl_ItemRequested(It, 0)} :- item(It).
+{fl_PersonRequested(P, 0)} :- person(P).
+{fl_RoomRequested(R, 0)} :- room(R).

@@ -1,0 +1,47 @@
+astep(0..m-1).
+step(0..m).
+boolean(t; f).
+door(left; right).
+
+% UEC
+:- obs_TigerPositionObserved(L1, I), obs_TigerPositionObserved(L2, I), L1 != L2.
+:- not obs_TigerPositionObserved(left, I), not obs_TigerPositionObserved(right, I), not obs_TigerPositionObserved(na, I), step(I).
+:- fl_TigerPosition(left, I), fl_TigerPosition(right, I).
+:- not fl_TigerPosition(left, I), not fl_TigerPosition(right, I), step(I).
+:- act_Listen(t, I), act_Listen(f, I).
+:- not act_Listen(t, I), not act_Listen(f, I), astep(I).
+:- act_OpenDoor(D, t, I), act_OpenDoor(D, f, I).
+:- not act_OpenDoor(D, t, I), not act_OpenDoor(D, f, I), door(D), astep(I).
+:- pf_Listen(t, I), pf_Listen(f, I).
+:- not pf_Listen(t, I), not pf_Listen(f, I), astep(I).
+
+% Probability Distribution
+@log(0.85) pf_Listen(t, I) :- astep(I).
+@log(0.15) pf_Listen(f, I) :- astep(I).
+
+% Utility Laws
+utility(10, I+1, D1, D2) :- fl_TigerPosition(D1, I+1), act_OpenDoor(D2, t, I), D1 != D2.
+utility(-100, I+1, D) :- fl_TigerPosition(D, I+1), act_OpenDoor(D, t, I).
+
+% Observation Laws
+obs_TigerPositionObserved(D, I+1) :- fl_TigerPosition(D, I+1), act_Listen(t, I), pf_Listen(t, I).
+obs_TigerPositionObserved(left, I+1) :- fl_TigerPosition(right, I+1), act_Listen(t, I), pf_Listen(f, I).
+obs_TigerPositionObserved(right, I+1) :- fl_TigerPosition(left, I+1), act_Listen(t, I), pf_Listen(f, I).
+
+% Fluent Dynamic Laws
+{fl_TigerPosition(D, I+1)} :- fl_TigerPosition(D, I), astep(I).
+
+% Actions and initial value of regular fluents and observation constants are exogenous
+{fl_TigerPosition(D, 0)} :- door(D).
+{obs_TigerPositionObserved(D, 0)} :- door(D).
+{obs_TigerPositionObserved(na, I)} :- step(I).
+{act_OpenDoor(D, B, I)} :- door(D), boolean(B), astep(I).
+{act_Listen(B, I)} :- boolean(B), astep(I).
+
+% No Concurrency
+:- act_OpenDoor(D1, t, I), act_OpenDoor(D2, t, I), D1 != D2.
+:- act_OpenDoor(D, t, I), act_Listen(t, I).
+
+% Debugging
+%:- not fl_TigerPosition(left, 0).
+%:- not act_Listen(t, 0).

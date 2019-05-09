@@ -1,0 +1,225 @@
+astep(0..m-1).
+step(0..m).
+boolean(t; f).
+item(coffee; coke; cookies).
+person(alice; bob; carol).
+room(r1; r2).
+
+% UEC
+:- obs_Item(X1, I), obs_Item(X2, I), X1 != X2.
+:- not obs_Item(coffee, I), not obs_Item(coke, I),
+   not obs_Item(cookies, I),
+   not obs_Item(na, I), step(I).
+:- obs_Person(X1, I), obs_Person(X2, I), X1 != X2.
+:- not obs_Person(alice, I), not obs_Person(bob, I),
+   not obs_Person(carol, I), not obs_Person(na, I),
+   step(I).
+:- obs_Room(X1, I), obs_Room(X2, I), X1 != X2.
+:- not obs_Room(r1, I), not obs_Room(r2, I),
+   not obs_Room(na, I),
+   step(I).
+:- obs_YesOrNo(X1, I), obs_YesOrNo(X2, I), X1 != X2.
+:- not obs_YesOrNo(yes, I), not obs_YesOrNo(no, I),
+   not obs_YesOrNo(na, I), step(I).
+
+:- fl_ItemRequested(X1, I), fl_ItemRequested(X2, I), X1 != X2.
+:- not fl_ItemRequested(coffee, I), not fl_ItemRequested(coke, I),
+   not fl_ItemRequested(cookies, I), 
+   not fl_ItemRequested(na, I), step(I).
+:- fl_PersonRequested(X1, I), fl_PersonRequested(X2, I), X1 != X2.
+:- not fl_PersonRequested(alice, I), not fl_PersonRequested(bob, I),
+   not fl_PersonRequested(carol, I), not fl_PersonRequested(na, I),
+   step(I).
+:- fl_RoomRequested(X1, I), fl_RoomRequested(X2, I), X1 != X2.
+:- not fl_RoomRequested(r1, I), not fl_RoomRequested(r2, I),
+   not fl_RoomRequested(na, I),
+   step(I).
+:- fl_Terminated(X1, I), fl_Terminated(X2, I), X1 != X2.
+:- not fl_Terminated(t, I), not fl_Terminated(f, I), step(I).
+
+:- act_AskWhichItem(X1, I), act_AskWhichItem(X2, I), X1 != X2.
+:- not act_AskWhichItem(t, I), not act_AskWhichItem(f, I), astep(I).
+:- act_AskWhichPerson(X1, I), act_AskWhichPerson(X2, I), X1 != X2.
+:- not act_AskWhichPerson(t, I), not act_AskWhichPerson(f, I), astep(I).
+:- act_AskWhichRoom(X1, I), act_AskWhichRoom(X2, I), X1 != X2.
+:- not act_AskWhichRoom(t, I), not act_AskWhichRoom(f, I), astep(I).
+:- act_Ask2ConfirmItem(It, X1, I), act_Ask2ConfirmItem(It, X2, I), X1 != X2.
+:- not act_Ask2ConfirmItem(It, t, I), not act_Ask2ConfirmItem(It, f, I), item(It), astep(I).
+:- act_Ask2ConfirmPerson(P, X1, I), act_Ask2ConfirmPerson(P, X2, I), X1 != X2.
+:- not act_Ask2ConfirmPerson(P, t, I), not act_Ask2ConfirmPerson(P, f, I), person(P), astep(I).
+:- act_Ask2ConfirmRoom(R, X1, I), act_Ask2ConfirmRoom(R, X2, I), X1 != X2.
+:- not act_Ask2ConfirmRoom(R, t, I), not act_Ask2ConfirmRoom(R, f, I), room(R), astep(I).
+:- act_Deliver(It, P, R, X1, I), act_Deliver(It, P, R, X2, I), X1 != X2.
+:- not act_Deliver(It, P, R, t, I), not act_Deliver(It, P, R, f, I), item(It), person(P), room(R), astep(I).
+
+:- pf_AnswerWhichItem(It, X1, I), pf_AnswerWhichItem(It, X2, I), X1 != X2.
+:- not pf_AnswerWhichItem(It, coffee, I), not pf_AnswerWhichItem(It, coke, I),
+   not pf_AnswerWhichItem(It, cookies, I),
+   item(It), astep(I).
+:- pf_AnswerWhichPerson(P, X1, I), pf_AnswerWhichPerson(P, X2, I), X1 != X2.
+:- not pf_AnswerWhichPerson(P, alice, I), not pf_AnswerWhichPerson(P, bob, I),
+   not pf_AnswerWhichPerson(P, carol, I), person(P), astep(I).
+:- pf_AnswerWhichRoom(R, X1, I), pf_AnswerWhichRoom(R, X2, I), X1 != X2.
+:- not pf_AnswerWhichRoom(R, r1, I), not pf_AnswerWhichRoom(R, r2, I),
+   room(R), astep(I).
+:- pf_AnswerConsistentConfirm(X1, I), pf_AnswerConsistentConfirm(X2, I), X1 != X2.
+:- not pf_AnswerConsistentConfirm(yes, I), not pf_AnswerConsistentConfirm(no, I), astep(I).
+:- pf_AnswerInconsistentConfirm(X1, I), pf_AnswerInconsistentConfirm(X2, I), X1 != X2.
+:- not pf_AnswerInconsistentConfirm(yes, I), not pf_AnswerInconsistentConfirm(no, I), astep(I).
+
+% Probability Distribution
+@log(0.8) pf_AnswerWhichItem(coffee, coffee, I) :- astep(I).
+@log(0.2) pf_AnswerWhichItem(coffee, coke, I) :- astep(I).
+@log(0.2) pf_AnswerWhichItem(coffee, cookies, I) :- astep(I).
+@log(0.2) pf_AnswerWhichItem(coke, coffee, I) :- astep(I).
+@log(0.8) pf_AnswerWhichItem(coke, coke, I) :- astep(I).
+@log(0.2) pf_AnswerWhichItem(coke, cookies, I) :- astep(I).
+@log(0.2) pf_AnswerWhichItem(cookies, coffee, I) :- astep(I).
+@log(0.2) pf_AnswerWhichItem(cookies, coke, I) :- astep(I).
+@log(0.8) pf_AnswerWhichItem(cookies, cookies, I) :- astep(I).
+
+@log(0.8) pf_AnswerWhichPerson(alice, alice, I) :- astep(I).
+@log(0.1) pf_AnswerWhichPerson(alice, bob, I) :- astep(I).
+@log(0.1) pf_AnswerWhichPerson(alice, carol, I) :- astep(I).
+@log(0.1) pf_AnswerWhichPerson(bob, alice, I) :- astep(I).
+@log(0.8) pf_AnswerWhichPerson(bob, bob, I) :- astep(I).
+@log(0.1) pf_AnswerWhichPerson(bob, carol, I) :- astep(I).
+@log(0.1) pf_AnswerWhichPerson(carol, alice, I) :- astep(I).
+@log(0.1) pf_AnswerWhichPerson(carol, bob, I) :- astep(I).
+@log(0.8) pf_AnswerWhichPerson(carol, carol, I) :- astep(I).
+
+@log(0.8) pf_AnswerWhichRoom(r1, r1, I) :- astep(I).
+@log(0.2) pf_AnswerWhichRoom(r1, r2, I) :- astep(I).
+@log(0.2) pf_AnswerWhichRoom(r2, r1, I) :- astep(I).
+@log(0.8) pf_AnswerWhichRoom(r2, r2, I) :- astep(I).
+
+@log(0.8) pf_AnswerConsistentConfirm(yes, I) :- astep(I).
+@log(0.2) pf_AnswerConsistentConfirm(no, I) :- astep(I).
+
+@log(0.2) pf_AnswerInconsistentConfirm(yes, I) :- astep(I).
+@log(0.8) pf_AnswerInconsistentConfirm(no, I) :- astep(I).
+
+
+% Utility Laws
+utility(-20, I+1, It, P, R) :-  fl_ItemRequested(It1, I+1), act_Deliver(It, P, R, t, I), It1 != It.
+utility(-20, I+1, It, P, R) :-  fl_PersonRequested(P1, I+1), act_Deliver(It, P, R, t, I), P1 != P.
+utility(-30, I+1, It, P, R) :-  fl_RoomRequested(R1, I+1), act_Deliver(It, P, R, t, I), R1 != R.
+utility(20, I+1, It, P, R) :- fl_ItemRequested(It1, I+1), fl_PersonRequested(P1, I+1), fl_RoomRequested(R1, I+1), act_Deliver(It, P, R, t, I), It = It1, P = P1, R = R1.
+
+% Observation Laws
+obs_Item(It1, I+1) :- fl_ItemRequested(It, I+1), fl_Terminated(f, I+1), 
+           act_AskWhichItem(t, I), pf_AnswerWhichItem(It, It1, I).
+obs_Person(P1, I+1) :- fl_PersonRequested(P, I+1), fl_Terminated(f, I+1), 
+           act_AskWhichPerson(t, I), pf_AnswerWhichPerson(P, P1, I).
+obs_Room(R1, I+1) :- fl_RoomRequested(R, I+1), fl_Terminated(f, I+1), 
+           act_AskWhichRoom(t, I), pf_AnswerWhichRoom(R, R1, I).
+obs_YesOrNo(C, I+1) :- fl_ItemRequested(It, I+1), fl_Terminated(f, I+1),
+           act_Ask2ConfirmItem(It, t, I), pf_AnswerConsistentConfirm(C, I).
+obs_YesOrNo(C, I+1) :- fl_PersonRequested(P, I+1), fl_Terminated(f, I+1),
+           act_Ask2ConfirmPerson(P, t, I), pf_AnswerConsistentConfirm(C, I).
+obs_YesOrNo(C, I+1) :- fl_RoomRequested(R, I+1), fl_Terminated(f, I+1),
+           act_Ask2ConfirmRoom(R, t, I), pf_AnswerConsistentConfirm(C, I).
+obs_YesOrNo(C, I+1) :- fl_ItemRequested(It, I+1), fl_Terminated(f, I+1),
+           act_Ask2ConfirmItem(It1, t, I), It1 != It, pf_AnswerInconsistentConfirm(C, I).
+obs_YesOrNo(C, I+1) :- fl_PersonRequested(P, I+1), fl_Terminated(f, I+1),
+           act_Ask2ConfirmPerson(P1, t, I), P1 != P, pf_AnswerInconsistentConfirm(C, I).
+obs_YesOrNo(C, I+1) :- fl_RoomRequested(R, I+1), fl_Terminated(f, I+1),
+           act_Ask2ConfirmRoom(R1, t, I), R1 != R, pf_AnswerInconsistentConfirm(C, I).
+%% No two observations can occur at the same time step
+:- obs_Item(It, I), obs_Person(P, I), It != na, P != na.
+:- obs_Item(It, I), obs_Room(R, I), It != na, R != na.
+:- obs_Item(It, I), obs_YesOrNo(C, I), It != na, C != na.
+:- obs_Person(P, I), obs_Room(R, I), P != na, R != na.
+:- obs_Person(P, I), obs_YesOrNo(C, I), P != na, C != na.
+:- obs_Room(R, I), obs_YesOrNo(C, I), R != na, C != na.
+
+% Fluent Dynamic Laws
+fl_Terminated(t, I+1) :- act_Deliver(It, P, R, t, I).
+{fl_ItemRequested(It, I+1)} :- fl_ItemRequested(It, I), astep(I).
+{fl_PersonRequested(P, I+1)} :- fl_PersonRequested(P, I), astep(I).
+{fl_RoomRequested(R, I+1)} :- fl_RoomRequested(R, I), astep(I).
+{fl_Terminated(B, I+1)} :- fl_Terminated(B, I), astep(I).
+
+% Actions and initial value of regular fluents and observation constants are exogenous
+{fl_Terminated(B, 0)} :- boolean(B).
+{fl_ItemRequested(It, 0)} :- item(It).
+{fl_PersonRequested(P, 0)} :- person(P).
+{fl_RoomRequested(R, 0)} :- room(R).
+{obs_Item(It, 0)} :- item(It).
+{obs_Person(P, 0)} :- person(P).
+{obs_Room(R, 0)} :- room(R).
+{obs_YesOrNo(yes, 0); obs_YesOrNo(no, 0)}.
+{act_AskWhichItem(B, I)} :- boolean(B), astep(I).
+{act_AskWhichPerson(B, I)} :- boolean(B), astep(I).
+{act_AskWhichRoom(B, I)} :- boolean(B), astep(I).
+{act_Ask2ConfirmItem(It, B, I)} :- item(It), boolean(B), astep(I).
+{act_Ask2ConfirmPerson(P, B, I)} :- person(P), boolean(B), astep(I).
+{act_Ask2ConfirmRoom(R, B, I)} :- room(R), boolean(B), astep(I).
+{act_Deliver(It, P, R, B, I)} :- item(It), person(P), room(R), boolean(B), astep(I).
+
+% By default, observation constant has na value
+{obs_Item(na, I)} :- step(I).
+{obs_Person(na, I)} :- step(I).
+{obs_Room(na, I)} :- step(I).
+{obs_YesOrNo(na, I)} :- step(I).
+
+% No Concurrency
+:- act_AskWhichItem(t, I), act_AskWhichPerson(t, I).
+:- act_AskWhichItem(t, I), act_AskWhichRoom(t, I).
+:- act_AskWhichItem(t, I), act_Ask2ConfirmItem(It, t, I).
+:- act_AskWhichItem(t, I), act_Ask2ConfirmPerson(P, t, I).
+:- act_AskWhichItem(t, I), act_Ask2ConfirmRoom(R, t, I).
+:- act_AskWhichItem(t, I), act_Deliver(It, P, R, t, I).
+
+:- act_AskWhichPerson(t, I), act_AskWhichItem(t, I).
+:- act_AskWhichPerson(t, I), act_AskWhichRoom(t, I).
+:- act_AskWhichPerson(t, I), act_Ask2ConfirmItem(It, t, I).
+:- act_AskWhichPerson(t, I), act_Ask2ConfirmPerson(P, t, I).
+:- act_AskWhichPerson(t, I), act_Ask2ConfirmRoom(R, t, I).
+:- act_AskWhichPerson(t, I), act_Deliver(It, P, R, t, I).
+
+:- act_AskWhichRoom(t, I), act_AskWhichItem(t, I).
+:- act_AskWhichRoom(t, I), act_AskWhichPerson(t, I).
+:- act_AskWhichRoom(t, I), act_Ask2ConfirmItem(It, t, I).
+:- act_AskWhichRoom(t, I), act_Ask2ConfirmPerson(P, t, I).
+:- act_AskWhichRoom(t, I), act_Ask2ConfirmRoom(R, t, I).
+:- act_AskWhichRoom(t, I), act_Deliver(It, P, R, t, I).
+
+:- act_Ask2ConfirmItem(It, t, I), act_AskWhichItem(t, I).
+:- act_Ask2ConfirmItem(It, t, I), act_AskWhichPerson(t, I).
+:- act_Ask2ConfirmItem(It, t, I), act_AskWhichRoom(t, I).
+:- act_Ask2ConfirmItem(It, t, I), act_Ask2ConfirmPerson(P, t, I).
+:- act_Ask2ConfirmItem(It, t, I), act_Ask2ConfirmRoom(R, t, I).
+:- act_Ask2ConfirmItem(It, t, I), act_Deliver(It, P, R, t, I).
+
+:- act_Ask2ConfirmPerson(P, t, I), act_AskWhichItem(t, I).
+:- act_Ask2ConfirmPerson(P, t, I), act_AskWhichPerson(t, I).
+:- act_Ask2ConfirmPerson(P, t, I), act_AskWhichRoom(t, I).
+:- act_Ask2ConfirmPerson(P, t, I), act_Ask2ConfirmItem(It, t, I).
+:- act_Ask2ConfirmPerson(P, t, I), act_Ask2ConfirmRoom(R, t, I).
+:- act_Ask2ConfirmPerson(P, t, I), act_Deliver(It, P, R, t, I).
+
+
+:- act_Ask2ConfirmRoom(R, t, I), act_AskWhichItem(t, I).
+:- act_Ask2ConfirmRoom(R, t, I), act_AskWhichPerson(t, I).
+:- act_Ask2ConfirmRoom(R, t, I), act_AskWhichRoom(t, I).
+:- act_Ask2ConfirmRoom(R, t, I), act_Ask2ConfirmItem(It, t, I).
+:- act_Ask2ConfirmRoom(R, t, I), act_Ask2ConfirmPerson(P, t, I).
+:- act_Ask2ConfirmRoom(R, t, I), act_Deliver(It, P, R, t, I).
+
+:- act_Deliver(It, P, R, t, I), act_AskWhichItem(t, I).
+:- act_Deliver(It, P, R, t, I), act_AskWhichPerson(t, I).
+:- act_Deliver(It, P, R, t, I), act_AskWhichRoom(t, I).
+:- act_Deliver(It, P, R, t, I), act_Ask2ConfirmItem(It, t, I).
+:- act_Deliver(It, P, R, t, I), act_Ask2ConfirmPerson(P, t, I).
+:- act_Deliver(It, P, R, t, I), act_Ask2ConfirmRoom(R, t, I).
+
+:- act_Ask2ConfirmItem(It, t, I), act_Ask2ConfirmItem(It1, t, I), It != It1.
+:- act_Ask2ConfirmPerson(P, t, I), act_Ask2ConfirmPerson(P1, t, I), P != P1.
+:- act_Ask2ConfirmRoom(R, t, I), act_Ask2ConfirmRoom(R1, t, I), R != R1.
+
+:- act_Deliver(It, P, R, t, I), act_Deliver(It1, P1, R1, t, I), It != It1.
+:- act_Deliver(It, P, R, t, I), act_Deliver(It1, P1, R1, t, I), P != P1.
+:- act_Deliver(It, P, R, t, I), act_Deliver(It1, P, R1, t, I), R != R1.
+ 
+% Debugging

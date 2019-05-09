@@ -1,0 +1,52 @@
+astep(0..m-1).
+step(0..m).
+boolean(t; f).
+door(left; middle; right).
+tiger(t1; t2).
+
+% UEC
+:- obs_TigerPositionObserved(T, L1, I), obs_TigerPositionObserved(T, L2, I), L1 != L2.
+:- not obs_TigerPositionObserved(T, left, I), not obs_TigerPositionObserved(T, right, I), not obs_TigerPositionObserved(T, middle, I), not obs_TigerPositionObserved(T, na, I), step(I), tiger(T).
+:- fl_TigerPosition(T, L1, I), fl_TigerPosition(T, L2, I), L1 != L2.
+:- not fl_TigerPosition(T, left, I), not fl_TigerPosition(T, right, I), not fl_TigerPosition(T, middle, I), tiger(T), step(I).
+:- act_Listen(t, I), act_Listen(f, I).
+:- not act_Listen(t, I), not act_Listen(f, I), astep(I).
+:- act_OpenDoor(D, t, I), act_OpenDoor(D, f, I).
+:- not act_OpenDoor(D, t, I), not act_OpenDoor(D, f, I), door(D), astep(I).
+:- pf_Listen(t, I), pf_Listen(f, I).
+:- not pf_Listen(t, I), not pf_Listen(f, I), astep(I).
+
+% Probability Distribution
+@log(0.85) pf_Listen(t, I) :- astep(I).
+@log(0.15) pf_Listen(f, I) :- astep(I).
+
+% Utility Laws
+utility(10, I+1, D1, D2, D3) :- fl_TigerPosition(t1, D1, I+1), fl_TigerPosition(t2, D2, I+1), act_OpenDoor(D3, t, I), D3 != D1, D3 != D2.
+utility(-100, I+1, D) :- fl_TigerPosition(T, D, I+1), act_OpenDoor(D, t, I).
+utility(-1, I+1) :-  act_Listen(t, I).
+
+% Static Laws
+:- fl_TigerPosition(t1, D, I), fl_TigerPosition(t2, D, I).
+
+% Observation Laws
+:- obs_TigerPositionObserved(t1, D, I), obs_TigerPositionObserved(t2, D, I), D != na.
+obs_TigerPositionObserved(T, D, I+1) :- fl_TigerPosition(T, D, I+1), act_Listen(t, I), pf_Listen(t, I).
+obs_TigerPositionObserved(T, na, I+1) :- act_Listen(t, I), pf_Listen(f, I), tiger(T).
+
+% Fluent Dynamic Laws
+{fl_TigerPosition(T, D, I+1)} :- fl_TigerPosition(T, D, I), astep(I).
+
+% Actions and initial value of regular fluents and observation constants are exogenous
+{fl_TigerPosition(T, D, 0)} :- tiger(T), door(D).
+{obs_TigerPositionObserved(T, D, 0)} :- tiger(T), door(D).
+{obs_TigerPositionObserved(T, na, I)} :- tiger(T), step(I).
+{act_OpenDoor(D, B, I)} :- door(D), boolean(B), astep(I).
+{act_Listen(B, I)} :- boolean(B), astep(I).
+
+% No Concurrency
+:- act_OpenDoor(D1, t, I), act_OpenDoor(D2, t, I), D1 != D2.
+:- act_OpenDoor(D, t, I), act_Listen(t, I).
+
+% Debugging
+%:- not fl_TigerPosition(left, 0).
+%:- not act_Listen(t, 0).
