@@ -1,6 +1,6 @@
 # pbcplus2pomdp
 
-Python scripts that translate probabilistic action descriptions in pBC+ to POMDP models. The outputs are .pomdp files that can be used as input to POMDP solver APPL (https://github.com/AdaCompNUS/sarsop).
+Python scripts that translate probabilistic action descriptions in pBC+ (encodede as lpmln programs) to POMDP models. The outputs are .pomdp files that can be used as input to POMDP solver APPL (https://github.com/AdaCompNUS/sarsop).
 
 ## Usage
 
